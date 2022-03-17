@@ -27,24 +27,36 @@ class to_do_list():
         window.mainloop()
 
     def buttons(self, window):
-        new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command = lambda : create_list.top(window))
+        new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command = lambda : create_list().top())
+
         new_list_add.place(x=30,y=520)
 
 class create_list():
-    def __init__(self,window):
-        self.window = window
+    def __init__(self):
+        pass
     def top(self):
         nw = Toplevel()
         nw.geometry("600x600")
+        back_photo = (Image.open(os.path.join('note.png')))
+        resize = back_photo.resize((WIDTH, HEIGHT), Image.ANTIALIAS)
+        img = ImageTk.PhotoImage(resize)
+        back_canvas = Canvas(nw,width=600, height=600)
+        back_canvas.pack(fill="both", expand=True)
+        back_canvas.create_image(0,0,image=img, anchor="nw")
+
         nw.title("list")
         self.buttons(nw)
-
-    def buttons(self, nw):
-        add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00", command=lambda: self.add_to_list())
-        add_butt.place(x=300, y=200)
-
-    def add_to_list(self):
-        pass
+    def buttons(self,nw):
+        add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00")
+        add_butt.place(x=50, y=500)
+        edit_butt = Button(nw,text="Edit", font=('Arial',30),bg="#3ADF00")
+        edit_butt.place(x=150,y=500)
+        remove_butt = Button(nw, text = "Remove", font=("Arial",30),bg="#3ADF00")
+        remove_butt.place(x=250,y=500)
+        up_butt = Button(nw, text = '\u2191',bg="#3ADF00")
+        up_butt.place(x=450,y=500)
+        down_butt = Button(nw, text = '\u2193',bg="#3ADF00")
+        down_butt.place(x=450,y=530)
 
 def main():
     main_window = to_do_list()
