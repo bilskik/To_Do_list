@@ -1,10 +1,16 @@
-
 from tkinter import *
 import os.path
 from PIL import Image, ImageTk
 
 WIDTH = 600
 HEIGHT = 600
+ENTRY_X = 20
+ENTRY_Y = 75
+entry_list = []
+sub_list = []
+data = []
+number_list = []
+NUMBER_INDEX = 0
 
 class to_do_list():
     def __init__(self):
@@ -28,7 +34,6 @@ class to_do_list():
 
     def buttons(self, window):
         new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command = lambda : create_list().top())
-
         new_list_add.place(x=30,y=520)
 
 class create_list():
@@ -37,26 +42,145 @@ class create_list():
     def top(self):
         nw = Toplevel()
         nw.geometry("600x600")
+        nw.title("list")
+        global back_photo
+        global img
+        global back_canvas
         back_photo = (Image.open(os.path.join('note.png')))
         resize = back_photo.resize((WIDTH, HEIGHT), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(resize)
-        back_canvas = Canvas(nw,width=600, height=600)
-        back_canvas.pack(fill="both", expand=True)
-        back_canvas.create_image(0,0,image=img, anchor="nw")
-
-        nw.title("list")
+        back_canvas = Canvas(nw, width=600, height=600)
+        back_canvas.pack()
+        back_canvas.create_image(0,0,image=img,anchor='nw')
+        back_canvas.image = img
+        back_canvas.create_text(300,50,text="Lista 1: ", font=('Arial',30),fill='black')
         self.buttons(nw)
+
     def buttons(self,nw):
-        add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00")
+        add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00",command = lambda : self.entry_managment(nw,0))
         add_butt.place(x=50, y=500)
-        edit_butt = Button(nw,text="Edit", font=('Arial',30),bg="#3ADF00")
+        edit_butt = Button(nw,text="Edit", font=('Arial',30),bg="#3ADF00", command=lambda : self.entry_managment(nw,2))
         edit_butt.place(x=150,y=500)
-        remove_butt = Button(nw, text = "Remove", font=("Arial",30),bg="#3ADF00")
+        remove_butt = Button(nw, text = "Remove", font=("Arial",30),bg="#3ADF00", command = lambda : self.entry_managment(nw,1))
         remove_butt.place(x=250,y=500)
-        up_butt = Button(nw, text = '\u2191',bg="#3ADF00")
+        up_butt = Button(nw, text = '\u2191',bg="#3ADF00", command = lambda : self.choose_entry(nw,'up'))
         up_butt.place(x=450,y=500)
-        down_butt = Button(nw, text = '\u2193',bg="#3ADF00")
+        down_butt = Button(nw, text = '\u2193',bg="#3ADF00",command = lambda : self.choose_entry(nw,'down'))
         down_butt.place(x=450,y=530)
+    def entry_managment(self,nw, checker):
+        global ENTRY_Y
+        global entry_list
+        global data
+        global NUMBER_INDEX
+        if checker == 0:
+            if not len(entry_list) == 0:
+                entry_list[-1].config(state=DISABLED)
+            ENTRY_Y += 35
+            entry = Entry(nw, font=('Arial', 15), width=45, state=DISABLED)
+            entry_list.append(entry)
+            sub_but = Button(nw,text='submit',command= lambda : self.data_add(entry))
+            sub_list.append(sub_but)
+            sub_but.place(x = 520, y = ENTRY_Y )
+            entry.place(x=40, y=ENTRY_Y)
+            self.numbernig(nw,checker)
+        elif checker == 1:
+            if len(entry_list) == 0:
+                pass
+            else:
+                ENTRY_Y -= 35
+                sub_list[-1].destroy()
+                sub_list.pop()
+                entry_list[-1].destroy()
+                entry_list.pop()
+                self.numbernig(nw,checker)
+                if not len(data) == 0:
+                    data.pop()
+        elif checker == 2:
+            entry_list[NUMBER_INDEX-1].config(state=NORMAL)
+
+    def data_add(self,entry):
+        global data
+        data.append(entry.get())
+        entry.config(state=DISABLED)
+    def numbernig(self,nw,checker):
+        global entry_list
+        global ENTRY_Y
+        global number_list
+        global NUMBER_INDEX
+        if checker == 0:
+            number = str(len(entry_list))
+            label = Label(nw,text = number,font=('Arial',15), fg = 'black', bg = '#FE2E2E')
+            label.place(x=10, y = ENTRY_Y)
+            number_list.append(label)
+
+            if not len(number_list) == 0:
+                for i in range(0,len(number_list)):
+                    if i == len(number_list) - 1:
+                        number_list[i].config(bg='#FE2E2E')
+                        break
+                    else:
+                        number_list[i].config(bg = '#2EFEF7')
+                NUMBER_INDEX = len(number_list)
+            else:
+                NUMBER_INDEX += 1
+        else:
+            NUMBER_INDEX -= 1
+            number_list[-1].destroy()
+            number_list.pop()
+
+            if not len(number_list) == 0:
+                for i in range(0, len(number_list)):
+                    if i == len(number_list) - 1:
+                        number_list[i].config(bg='#FE2E2E')
+                        break
+                    else:
+                        number_list[i].config(bg='#2EFEF7')
+                NUMBER_INDEX = len(number_list)
+
+
+    def choose_entry(self,nw, direction):
+        global entry_list
+        global number_list
+        global NUMBER_INDEX
+        global data
+        if direction == 'up':
+            if len(number_list) == NUMBER_INDEX:
+                pass
+            else:
+                #if entry_list[NUMBER_INDEX-1]['state'] == NORMAL:
+                   # data[NUMBER_INDEX - 1] = entry_list[NUMBER_INDEX-1].get
+                NUMBER_INDEX += 1
+                for i in range(0,len(number_list)):
+                    if i + 1 == NUMBER_INDEX:
+                        number_list[i].config(bg='#FE2E2E')
+                    else:
+                        number_list[i].config(bg='#2EFEF7')
+        elif direction == 'down':
+            if NUMBER_INDEX == 1:
+                pass
+            else:
+                NUMBER_INDEX -= 1
+                for i in range(0, len(number_list)):
+                    if i + 1 == NUMBER_INDEX:
+                        number_list[i].config(bg='#FE2E2E')
+                    else:
+                        number_list[i].config(bg='#2EFEF7')
+
+
+
+
+
+class Node:
+    def __init__(self,data):
+        self.data = data
+        self.next = None
+        self.prev = None
+class DoublyLinkedList:
+    def __init__(self,head):
+        self.head = None
+        self.tail = None
+
+
 
 def main():
     main_window = to_do_list()
