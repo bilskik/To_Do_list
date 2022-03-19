@@ -57,24 +57,23 @@ class create_list():
         self.buttons(nw)
 
     def buttons(self,nw):
-        add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00",command = lambda : self.entry_managment(nw,0))
+        add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00",command = lambda : self.entry_managment(nw,'add'))
         add_butt.place(x=50, y=500)
-        edit_butt = Button(nw,text="Edit", font=('Arial',30),bg="#3ADF00", command=lambda : self.entry_managment(nw,2))
+        edit_butt = Button(nw,text="Edit", font=('Arial',30),bg="#3ADF00", command=lambda : self.entry_managment(nw,'edit'))
         edit_butt.place(x=150,y=500)
-        remove_butt = Button(nw, text = "Remove", font=("Arial",30),bg="#3ADF00", command = lambda : self.entry_managment(nw,1))
+        remove_butt = Button(nw, text = "Remove", font=("Arial",30),bg="#3ADF00", command = lambda : self.entry_managment(nw,'remove'))
         remove_butt.place(x=250,y=500)
         up_butt = Button(nw, text = '\u2191',bg="#3ADF00", command = lambda : self.choose_entry(nw,'up'))
         up_butt.place(x=450,y=500)
         down_butt = Button(nw, text = '\u2193',bg="#3ADF00",command = lambda : self.choose_entry(nw,'down'))
         down_butt.place(x=450,y=530)
-    def entry_managment(self,nw, checker):
+    def entry_managment(self,nw, button):
         global ENTRY_Y
         global entry_list
         global data
+        global number_list
         global NUMBER_INDEX
-        if checker == 0:
-            if not len(entry_list) == 0:
-                entry_list[-1].config(state=DISABLED)
+        if button == 'add':
             ENTRY_Y += 35
             entry = Entry(nw, font=('Arial', 15), width=45, state=DISABLED)
             entry_list.append(entry)
@@ -82,32 +81,51 @@ class create_list():
             sub_list.append(sub_but)
             sub_but.place(x = 520, y = ENTRY_Y )
             entry.place(x=40, y=ENTRY_Y)
-            self.numbernig(nw,checker)
-        elif checker == 1:
+            self.numbernig(nw,button)
+        elif button == 'remove':
             if len(entry_list) == 0:
                 pass
             else:
-                ENTRY_Y -= 35
-                sub_list[-1].destroy()
-                sub_list.pop()
-                entry_list[-1].destroy()
-                entry_list.pop()
-                self.numbernig(nw,checker)
-                if not len(data) == 0:
-                    data.pop()
-        elif checker == 2:
-            entry_list[NUMBER_INDEX-1].config(state=NORMAL)
+                for i in range(0,len(number_list)):
+                    if number_list[i]['bg'] == '#FE2E2E':
+                        if len(number_list) - 1 == i:
+                            sub_list[i].destroy()
+                            sub_list.pop(i)
+                            entry_list[i].destroy()
+                            entry_list.pop(i)
+                            self.numbernig(nw,button)
+                        else:
+                            sub_list[i].destroy()
+                            sub_list.pop(i)
+                            entry_list[i].destroy()
+                            entry_list.pop(i)
+                            tmp = len(number_list) - i - 1
+                            ENTRY_Y = ENTRY_Y - 35*tmp
+                            list_length = len(sub_list) - 1
+                            for j in range(i,len(number_list)):
+                                if j > list_length:
+                                    ENTRY_Y-=35
+                                    break
+                                sub_list[j].place(x = 520, y = ENTRY_Y)
+                                entry_list[j].place(x = 40, y =ENTRY_Y)
+                                ENTRY_Y += 35
+                            number_list[-1].destroy()
+                            number_list.pop()
+                            break
+        elif button == 'edit':
+            if not len(entry_list) == 0:
+                entry_list[NUMBER_INDEX-1].config(state=NORMAL)
 
     def data_add(self,entry):
         global data
         data.append(entry.get())
         entry.config(state=DISABLED)
-    def numbernig(self,nw,checker):
+    def numbernig(self,nw,button):
         global entry_list
         global ENTRY_Y
         global number_list
         global NUMBER_INDEX
-        if checker == 0:
+        if button == 'add':
             number = str(len(entry_list))
             label = Label(nw,text = number,font=('Arial',15), fg = 'black', bg = '#FE2E2E')
             label.place(x=10, y = ENTRY_Y)
@@ -136,6 +154,7 @@ class create_list():
                     else:
                         number_list[i].config(bg='#2EFEF7')
                 NUMBER_INDEX = len(number_list)
+            ENTRY_Y -= 35
 
 
     def choose_entry(self,nw, direction):
@@ -147,8 +166,6 @@ class create_list():
             if len(number_list) == NUMBER_INDEX:
                 pass
             else:
-                #if entry_list[NUMBER_INDEX-1]['state'] == NORMAL:
-                   # data[NUMBER_INDEX - 1] = entry_list[NUMBER_INDEX-1].get
                 NUMBER_INDEX += 1
                 for i in range(0,len(number_list)):
                     if i + 1 == NUMBER_INDEX:
