@@ -6,6 +6,7 @@ WIDTH = 600
 HEIGHT = 600
 ENTRY_X = 20
 ENTRY_Y = 75
+LIST_Y = 40
 entry_list = []
 sub_list = []
 data = []
@@ -13,8 +14,8 @@ number_list = []
 NUMBER_INDEX = 0
 
 class to_do_list():
-    def __init__(self):
-        pass
+    def __init__(self,list):
+        self.list = list
     def main_setting(self):
         window = Tk()
         window.geometry("600x600")
@@ -28,24 +29,30 @@ class to_do_list():
         my_canvas.create_text(300,50,text="To Do List", font=('Arial',40), fill="white")
         my_canvas.create_line(0,100,600,100,width='5')
         self.buttons(window)
-
-
         window.mainloop()
 
     def buttons(self, window):
-        new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command = lambda : create_list().top())
+
+        new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command = lambda : [create_list(list).top(), self.add_to_list(), self.create_button_list(window)])
         new_list_add.place(x=30,y=520)
 
-class create_list():
-    def __init__(self):
+    def add_to_list(self):
         pass
+    def create_button_list(self,window):
+        global LIST_Y
+        LIST_Y += 80
+        List_button = Button(window,text= 'Lista_1' , font=("Arial",30), bg="#00BFFF")
+        List_button.place(x=30,y = LIST_Y)
+class create_list():
+    def __init__(self, list):
+        self.list = list
     def top(self):
-        nw = Toplevel()
-        nw.geometry("600x600")
-        nw.title("list")
         global back_photo
         global img
         global back_canvas
+        nw = Toplevel()
+        nw.geometry("600x600")
+        nw.title("list")
         back_photo = (Image.open(os.path.join('note.png')))
         resize = back_photo.resize((WIDTH, HEIGHT), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(resize)
@@ -53,7 +60,7 @@ class create_list():
         back_canvas.pack()
         back_canvas.create_image(0,0,image=img,anchor='nw')
         back_canvas.image = img
-        back_canvas.create_text(300,50,text="Lista 1: ", font=('Arial',30),fill='black')
+        back_canvas.create_text(150,50,text="Lista 1: ", font=('Arial',30),fill='black')
         self.buttons(nw)
 
     def buttons(self,nw):
@@ -67,12 +74,28 @@ class create_list():
         up_butt.place(x=450,y=500)
         down_butt = Button(nw, text = '\u2193',bg="#3ADF00",command = lambda : self.choose_entry(nw,'down'))
         down_butt.place(x=450,y=530)
+        #quit_but = Button(nw, text = 'save&quit',font=("Arial",20),bg="#3ADF00",command = lambda : self.save_quit(nw))
+       # quit_but.place(x= 450, y =30)
+    '''
+    def save_quit(self,nw):
+        global entry_list
+        global data
+        global number_list
+        global sub_list
+        global NUMBER_INDEX
+        data.clear()
+        number_list.clear()
+        sub_list.clear()
+        NUMBER_INDEX = 0
+        nw.destroy()
+    '''
     def entry_managment(self,nw, button):
         global ENTRY_Y
         global entry_list
         global data
         global number_list
         global NUMBER_INDEX
+        print(len(data))
         if button == 'add':
             ENTRY_Y += 35
             entry = Entry(nw, font=('Arial', 15), width=45, state=DISABLED)
@@ -118,6 +141,7 @@ class create_list():
 
     def data_add(self,entry):
         global data
+        global sub_list
         data.append(entry.get())
         entry.config(state=DISABLED)
     def numbernig(self,nw,button):
@@ -183,24 +207,33 @@ class create_list():
                     else:
                         number_list[i].config(bg='#2EFEF7')
 
-
-
-
-
 class Node:
-    def __init__(self,data):
+    def __init__(self,data,index):
         self.data = data
+        self.index = index
         self.next = None
         self.prev = None
 class DoublyLinkedList:
-    def __init__(self,head):
+    def __init__(self):
         self.head = None
         self.tail = None
-
-
+    def append_last(self,data,index):
+        newnode = Node(data,index)
+        newnode.next = None
+        if self.head is None:
+            newnode.prev = None
+            self.head = newnode
+            return
+        last = self.head
+        while(last.next is not None):
+            last = last.next
+        last.next = newnode
+        newnode.prev = last
+        return
 
 def main():
-    main_window = to_do_list()
+    main_list = DoublyLinkedList()
+    main_window = to_do_list(main_list)
     main_window.main_setting()
 if __name__ == "__main__":
         main()
