@@ -1,23 +1,19 @@
 from tkinter import *
 import os.path
 from PIL import Image, ImageTk
-from collections import OrderedDict
+import numpy
 
 WIDTH = 600
 HEIGHT = 600
-ENTRY_X = 20
-ENTRY_Y = 75
 LIST_Y = 40
-entry_list = []
-sub_list = []
-data = {}
-counter = 0
-number_list = []
-NUMBER_INDEX = 0
+
+
+
 
 class to_do_list():
     def __init__(self,list):
         self.list = list
+        self.data = {}
     def main_setting(self):
         window = Tk()
         window.geometry("600x600")
@@ -34,19 +30,31 @@ class to_do_list():
         window.mainloop()
 
     def buttons(self, window):
-        new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command = lambda : [create_list(list).top(), self.add_to_list(), self.create_button_list(window)])
+        new_list_add = Button(window, text="Create new list", font=("Arial",30), bg="#00BFFF" ,command =
+        lambda : [create_list(self.data).top(), self.add_to_list(), self.create_button_list(window)])
         new_list_add.place(x=30,y=520)
-
     def add_to_list(self):
         pass
     def create_button_list(self,window):
         global LIST_Y
         LIST_Y += 80
-        List_button = Button(window,text= 'Lista_1' , font=("Arial",30), bg="#00BFFF")
+        List_button = Button(window,text= 'Lista_1' , font=("Arial",30), bg="#00BFFF", command = lambda : [self.read_from_file(), create_list(self.data).top()])
         List_button.place(x=30,y = LIST_Y)
+    def read_from_file(self):
+        self.data = numpy.load('created_data/1.txt.npy', allow_pickle='TRUE').item()
+        print(self.data)
+
 class create_list():
-    def __init__(self, list):
-        self.list = list
+    def __init__(self,data):
+        self.list =[]
+        self.ENTRY_X = 20
+        self.ENTRY_Y  = 75
+        self.entry_list  = []
+        self.sub_list = []
+        self.data =  data
+        self.counter =  0
+        self.number_list = []
+        self.NUMBER_INDEX =  0
     def top(self):
         global back_photo
         global img
@@ -75,162 +83,134 @@ class create_list():
         up_butt.place(x=450,y=500)
         down_butt = Button(nw, text = '\u2193',bg="#3ADF00",command = lambda : self.choose_entry(nw,'down'))
         down_butt.place(x=450,y=530)
-        #quit_but = Button(nw, text = 'save&quit',font=("Arial",20),bg="#3ADF00",command = lambda : self.save_quit(nw))
-       # quit_but.place(x= 450, y =30)
-    '''
+        quit_but = Button(nw, text = 'save&quit',font=("Arial",20),bg="#3ADF00",command = lambda : self.save_quit(nw))
+        quit_but.place(x= 450, y =30)
     def save_quit(self,nw):
-        global entry_list
-        global data
-        global number_list
-        global sub_list
-        global NUMBER_INDEX
-        data.clear()
-        number_list.clear()
-        sub_list.clear()
-        NUMBER_INDEX = 0
+        numpy.save('created_data/1.txt',self.data)
+        self.data.clear()
         nw.destroy()
-    '''
     def entry_managment(self,nw, button):
-        global ENTRY_Y
-        global entry_list
-        global data
-        global number_list
-        global NUMBER_INDEX
-        global counter
-        print(len(data))
-        #print(data)
+        print(len(self.data))
         if button == 'add':
-            data[counter]=''
-            ENTRY_Y += 35
+            self.data[self.counter]=''
+            self.ENTRY_Y += 35
             entry = Entry(nw, font=('Arial', 15), width=45, state=DISABLED)
-            entry_list.append(entry)
+            self.entry_list.append(entry)
             sub_but = Button(nw,text='submit',command= lambda : self.data_add(entry))
-            sub_list.append(sub_but)
-            sub_but.place(x = 520, y = ENTRY_Y )
-            entry.place(x=40, y=ENTRY_Y)
-            counter += 1
+            self.sub_list.append(sub_but)
+            sub_but.place(x = 520, y = self.ENTRY_Y )
+            entry.place(x=40, y=self.ENTRY_Y)
+            self.counter += 1
             self.numbernig(nw,button)
         elif button == 'remove':
-            if len(entry_list) == 0:
+            if len(self.entry_list) == 0:
                 pass
             else:
-                for i in range(0,len(number_list)):
-                    if number_list[i]['bg'] == '#FE2E2E':
-                        if len(number_list) - 1 == i:
-                            sub_list[i].destroy()
-                            sub_list.pop(i)
-                            entry_list[i].destroy()
-                            entry_list.pop(i)
+                for i in range(0,len(self.number_list)):
+                    if self.number_list[i]['bg'] == '#FE2E2E':
+                        if len(self.number_list) - 1 == i:
+                            self.sub_list[i].destroy()
+                            self.sub_list.pop(i)
+                            self.entry_list[i].destroy()
+                            self.entry_list.pop(i)
                             self.remove_data(i)
                             self.numbernig(nw,button)
                         else:
                             self.remove_data(i)
-                            sub_list[i].destroy()
-                            sub_list.pop(i)
-                            entry_list[i].destroy()
-                            entry_list.pop(i)
-                            tmp = len(number_list) - i - 1
-                            ENTRY_Y = ENTRY_Y - 35*tmp
-                            list_length = len(sub_list) - 1
-                            for j in range(i,len(number_list)):
+                            self.sub_list[i].destroy()
+                            self.sub_list.pop(i)
+                            self.entry_list[i].destroy()
+                            self.entry_list.pop(i)
+                            tmp = len(self.number_list) - i - 1
+                            self.ENTRY_Y = self.ENTRY_Y - 35*tmp
+                            list_length = len(self.sub_list) - 1
+                            for j in range(i,len(self.number_list)):
                                 if j > list_length:
-                                    ENTRY_Y-=35
+                                    self.ENTRY_Y-=35
                                     break
-                                sub_list[j].place(x = 520, y = ENTRY_Y)
-                                entry_list[j].place(x = 40, y =ENTRY_Y)
-                                ENTRY_Y += 35
-                            number_list[-1].destroy()
-                            number_list.pop()
+                                self.sub_list[j].place(x = 520, y = self.ENTRY_Y)
+                                self.entry_list[j].place(x = 40, y = self.ENTRY_Y)
+                                self.ENTRY_Y += 35
+                            self.number_list[-1].destroy()
+                            self.number_list.pop()
                             break
         elif button == 'edit':
-            if not len(entry_list) == 0:
-                entry_list[NUMBER_INDEX-1].config(state=NORMAL)
+            if not len(self.entry_list) == 0:
+                self.entry_list[self.NUMBER_INDEX-1].config(state=NORMAL)
 
     def remove_data(self,index):
-        global number_list
-        global data
-        data.pop(index)
-        a = len(data)
+        self.data.pop(index)
+        self.counter -= 1
+        a = len(self.data)
         dict = {}
-        list_of_values = list(data.values())
+        list_of_values = list(self.data.values())
         for i in range(0,a):
             dict[i] = ''
         for x in range(0,a):
             dict[x] = list_of_values[x]
-        data = dict
-        print(data)
+        self.data = dict
+        print(self.data)
     def data_add(self,entry):
-        global data
-        global sub_list
-        global number_list
-        for i in range(0,len(number_list)):
-            if number_list[i]['bg'] == '#FE2E2E':
-                data[i] = entry.get()
+        for i in range(0,len(self.number_list)):
+            if self.number_list[i]['bg'] == '#FE2E2E':
+                self.data[i] = entry.get()
                 entry.config(state=DISABLED)
                 break
         
     def numbernig(self,nw,button):
-        global entry_list
-        global ENTRY_Y
-        global number_list
-        global NUMBER_INDEX
         if button == 'add':
-            number = str(len(entry_list))
+            number = str(len(self.entry_list))
             label = Label(nw,text = number,font=('Arial',15), fg = 'black', bg = '#FE2E2E')
-            label.place(x=10, y = ENTRY_Y)
-            number_list.append(label)
+            label.place(x=10, y = self.ENTRY_Y)
+            self.number_list.append(label)
 
-            if not len(number_list) == 0:
-                for i in range(0,len(number_list)):
-                    if i == len(number_list) - 1:
-                        number_list[i].config(bg='#FE2E2E')
+            if not len(self.number_list) == 0:
+                for i in range(0,len(self.number_list)):
+                    if i == len(self.number_list) - 1:
+                        self.number_list[i].config(bg='#FE2E2E')
                         break
                     else:
-                        number_list[i].config(bg = '#2EFEF7')
-                NUMBER_INDEX = len(number_list)
+                        self.number_list[i].config(bg = '#2EFEF7')
+                self.NUMBER_INDEX = len(self.number_list)
             else:
-                NUMBER_INDEX += 1
+                self.NUMBER_INDEX += 1
         else:
-            NUMBER_INDEX -= 1
-            number_list[-1].destroy()
-            number_list.pop()
+            self.NUMBER_INDEX -= 1
+            self.number_list[-1].destroy()
+            self.number_list.pop()
 
-            if not len(number_list) == 0:
-                for i in range(0, len(number_list)):
-                    if i == len(number_list) - 1:
-                        number_list[i].config(bg='#FE2E2E')
+            if not len(self.number_list) == 0:
+                for i in range(0, len(self.number_list)):
+                    if i == len(self.number_list) - 1:
+                        self.number_list[i].config(bg='#FE2E2E')
                         break
                     else:
-                        number_list[i].config(bg='#2EFEF7')
-                NUMBER_INDEX = len(number_list)
-            ENTRY_Y -= 35
+                        self.number_list[i].config(bg='#2EFEF7')
+                self.NUMBER_INDEX = len(self.number_list)
+            self.ENTRY_Y -= 35
 
 
     def choose_entry(self,nw, direction):
-        global entry_list
-        global number_list
-        global NUMBER_INDEX
-        global data
         if direction == 'up':
-            if len(number_list) == NUMBER_INDEX:
+            if len(self.number_list) == self.NUMBER_INDEX:
                 pass
             else:
-                NUMBER_INDEX += 1
-                for i in range(0,len(number_list)):
-                    if i + 1 == NUMBER_INDEX:
-                        number_list[i].config(bg='#FE2E2E')
+                self.NUMBER_INDEX += 1
+                for i in range(0,len(self.number_list)):
+                    if i + 1 == self.NUMBER_INDEX:
+                        self.number_list[i].config(bg='#FE2E2E')
                     else:
-                        number_list[i].config(bg='#2EFEF7')
+                        self.number_list[i].config(bg='#2EFEF7')
         elif direction == 'down':
-            if NUMBER_INDEX == 1:
+            if self.NUMBER_INDEX == 1:
                 pass
             else:
-                NUMBER_INDEX -= 1
-                for i in range(0, len(number_list)):
-                    if i + 1 == NUMBER_INDEX:
-                        number_list[i].config(bg='#FE2E2E')
+                self.NUMBER_INDEX -= 1
+                for i in range(0, len(self.number_list)):
+                    if i + 1 == self.NUMBER_INDEX:
+                        self.number_list[i].config(bg='#FE2E2E')
                     else:
-                        number_list[i].config(bg='#2EFEF7')
+                        self.number_list[i].config(bg='#2EFEF7')
 
 class Node:
     def __init__(self,data,index):
