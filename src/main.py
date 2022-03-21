@@ -1,6 +1,7 @@
 from tkinter import *
 import os.path
 from PIL import Image, ImageTk
+from collections import OrderedDict
 
 WIDTH = 600
 HEIGHT = 600
@@ -9,7 +10,6 @@ ENTRY_Y = 75
 LIST_Y = 40
 entry_list = []
 sub_list = []
-#data = []
 data = {}
 counter = 0
 number_list = []
@@ -149,17 +149,15 @@ class create_list():
     def remove_data(self,index):
         global number_list
         global data
-        print(data)
         data.pop(index)
-        print(data)
-        for i in range(index,len(number_list)):
-            data[i] = data[i-1]
-            if i == len(number_list) - 2:
-                data.pop(i)
-                break
-
-
-        #sorted(data)
+        a = len(data)
+        dict = {}
+        list_of_values = list(data.values())
+        for i in range(0,a):
+            dict[i] = ''
+        for x in range(0,a):
+            dict[x] = list_of_values[x]
+        data = dict
         print(data)
     def data_add(self,entry):
         global data
