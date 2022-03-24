@@ -70,7 +70,23 @@ class create_list():
         back_canvas.create_image(0,0,image=img,anchor='nw')
         back_canvas.image = img
         back_canvas.create_text(150,50,text="Lista 1: ", font=('Arial',30),fill='black')
+        self.check_if_data_not_empty(nw)
         self.buttons(nw)
+
+    def check_if_data_not_empty(self,nw):
+        if self.data:
+            for i in range(0,len(self.data)):
+                self.ENTRY_Y += 35
+                entry = Entry(nw, font=('Arial', 15), width=45, state=NORMAL)
+                entry.insert(0,self.data[i])
+                entry.config(state=DISABLED)
+                self.entry_list.append(entry)
+                sub_but = Button(nw, text='submit', command=lambda: self.data_add(entry))
+                self.sub_list.append(sub_but)
+                sub_but.place(x=520, y=self.ENTRY_Y)
+                entry.place(x=40, y=self.ENTRY_Y)
+                self.counter += 1
+                self.numbernig(nw, 'add')
 
     def buttons(self,nw):
         add_butt = Button(nw, text="Add", font=('Arial', 30), bg="#3ADF00",command = lambda : self.entry_managment(nw,'add'))
